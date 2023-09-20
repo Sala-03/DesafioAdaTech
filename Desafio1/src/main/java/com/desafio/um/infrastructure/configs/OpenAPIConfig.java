@@ -1,5 +1,6 @@
 package com.desafio.um.infrastructure.configs;
 
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -32,3 +33,4 @@ public class OpenAPIConfig {
     }
 
 }
+
