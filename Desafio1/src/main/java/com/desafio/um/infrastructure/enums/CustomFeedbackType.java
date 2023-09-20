@@ -4,7 +4,7 @@ public enum CustomFeedbackType {
     ELOGIOS("elogios"),
     CRITICAS("criticas");
 
-    private String description;
+    private final String description;
     CustomFeedbackType(String description) {
         this.description = description;
     }
