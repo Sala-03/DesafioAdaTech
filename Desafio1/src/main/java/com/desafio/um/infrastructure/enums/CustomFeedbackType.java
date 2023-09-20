@@ -1,6 +1,6 @@
 package com.desafio.um.infrastructure.enums;
 public enum CustomFeedbackType {
-    SUSGESTOES("sugestoes"),
+    SUGESTOES("sugestoes"),
     ELOGIOS("elogios"),
     CRITICAS("criticas");
 
