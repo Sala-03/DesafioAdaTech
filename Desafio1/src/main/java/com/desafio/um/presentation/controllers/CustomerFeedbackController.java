@@ -1,36 +1,38 @@
 package com.desafio.um.presentation.controllers;
 
+import com.desafio.um.infrastructure.enums.CustomFeedbackType;
+import com.desafio.um.presentation.dtos.FeedbackDto;
 import com.desafio.um.presentation.services.ICustomerFeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.springbootstarter.service.QueueService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/queue")
+@RequestMapping
 public class CustomerFeedbackController {
 
     @Autowired
     private ICustomerFeedbackService customerFeedbackService;
 
-    @PostMapping("/enqueue")
-    public void enqueue(@RequestBody String item) {
-        queueService.enqueue(item);
+    @PostMapping
+    public void enqueue(@RequestBody FeedbackDto feedbackDto) {
+
     }
 
-    @GetMapping("/dequeue")
-    public String dequeue() {
-        return queueService.dequeue();
+    @PostMapping("/{type}")
+    public void dequeue() {
+
     }
 
-    @GetMapping("/isEmpty")
-    public boolean isEmpty() {
-        return queueService.isEmpty();
+    @GetMapping("/{type}")
+    public void getAll(@PathVariable(name = "type") CustomFeedbackType type) {
+
     }
 
-    @GetMapping("/size")
-    public int size() {
-        return queueService.size();
+    @GetMapping
+    public void getAll() {
+
     }
+
 }
 
 
