@@ -18,7 +18,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(
                 ExceptionDetails.builder()
                         .title("Não encontrado")
-                        .status(HttpStatus.FORBIDDEN.value())
+                        .status(HttpStatus.NOT_FOUND.value())
                         .details(exception.getMessage())
                         .developerMessage(NotFoundException.EXCEPTION_DEVELOPER_MESSAGE)
                         .className(Arrays.stream(exception.getStackTrace()).findFirst().get().getClassName())
