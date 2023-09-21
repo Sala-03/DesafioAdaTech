@@ -13,8 +13,11 @@ public interface ICustomerFeedbackService {
     void addLista(CustomerFeedback item);
 
     CustomerFeedback removeLista(CustomFeedbackType type);
+
     boolean isEmptyLista(CustomFeedbackType type);
+
     int sizeLista(CustomFeedbackType type);
+
     LinkedList<CustomerFeedback> exibirListaElogios(CustomFeedbackType type);
 /*
     CustomerFeedback removeListaSugestao();
@@ -23,7 +26,6 @@ public interface ICustomerFeedbackService {
 
     CustomerFeedback removeListaCritica();
 
-    boolean isEmptyLista(CustomFeedbackType type);
     boolean isEmptyListaSugestao();
 
     boolean isEmptyListaElogio();

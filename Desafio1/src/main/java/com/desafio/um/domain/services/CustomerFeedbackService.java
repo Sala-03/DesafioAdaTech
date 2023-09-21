@@ -27,7 +27,7 @@ public class CustomerFeedbackService implements ICustomerFeedbackService {
         }
         if (item.getFeeedbackType().equals(CustomFeedbackType.CRITICAS)) {
             item.setFeedbackStatus(CustomFeedbackStatus.RECEBIDO);
-            listaSugestao.addLast(item);
+            listaCritica.addLast(item);
         }
     }
 
