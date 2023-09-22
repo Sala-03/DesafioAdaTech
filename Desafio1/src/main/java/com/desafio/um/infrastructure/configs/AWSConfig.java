@@ -26,9 +26,13 @@ public class AWSConfig {
     @Value("${aws.secret.key}")
     private String SECRET_KEY;
 
+    @Value("${aws.region}")
+    private String awsRegion;
+
     @Bean
     public AmazonSNS snsClient() {
         return AmazonSNSClient.builder()
+                .withRegion(awsRegion)
                 .withCredentials(
                                 new AWSStaticCredentialsProvider(
                                         new BasicAWSCredentials(this.ACCESS_KEY, this.SECRET_KEY)
@@ -40,6 +44,7 @@ public class AWSConfig {
     @Bean
     public AmazonSQS sqsClient() {
         return AmazonSQSClient.builder()
+                .withRegion(awsRegion)
                 .withCredentials(
                         new AWSStaticCredentialsProvider(
                                 new BasicAWSCredentials(this.ACCESS_KEY, this.SECRET_KEY)
