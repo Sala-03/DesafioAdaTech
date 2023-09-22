@@ -4,6 +4,7 @@ import com.desafio.um.domain.models.CustomerFeedback;
 import com.desafio.um.infrastructure.enums.CustomFeedbackType;
 import com.desafio.um.presentation.dtos.FeedbackDto;
 import com.desafio.um.presentation.services.ICustomerFeedbackService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ public class CustomerFeedbackController {
 
     @PostMapping("/enqueue")
     @ResponseStatus(HttpStatus.CREATED)
-    public void enqueue(@RequestBody FeedbackDto feedbackDto) {
-        this.customerFeedbackService.addLista(new CustomerFeedback());
+    public void enqueue(@RequestBody @NotNull FeedbackDto feedbackDto) {
+        this.customerFeedbackService.addLista(feedbackDto);
     }
 
     @PostMapping("/{type}")
@@ -32,7 +33,7 @@ public class CustomerFeedbackController {
     @GetMapping("/{type}")
     @ResponseStatus(HttpStatus.OK)
     public List<CustomerFeedback> getAllByType(@PathVariable(name = "type") CustomFeedbackType type) {
-        return this.customerFeedbackService.exibirListaElogios(type);
+        return this.customerFeedbackService.exibirLista(type);
     }
 
     @GetMapping("/size/{type}")

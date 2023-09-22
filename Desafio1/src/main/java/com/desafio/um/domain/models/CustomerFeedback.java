@@ -7,15 +7,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerFeedback {
 
-    private Integer id;
-    private CustomFeedbackType feeedbackType;
-    private CustomFeedbackStatus feedbackStatus;
+    private UUID id;
+    private CustomFeedbackType type;
+    private CustomFeedbackStatus status;
     private String message;
+
+    public CustomerFeedback(CustomFeedbackType type, String message) {
+        this.id = UUID.randomUUID();
+        this.type = type;
+        this.status = CustomFeedbackStatus.RECEBIDO;
+        this.message = message;
+    }
 
 }

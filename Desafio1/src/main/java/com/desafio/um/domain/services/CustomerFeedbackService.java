@@ -1,153 +1,100 @@
 package com.desafio.um.domain.services;
 
+import com.amazonaws.services.sns.model.NotFoundException;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.desafio.um.infrastructure.configs.AWSConfig;
 import com.desafio.um.infrastructure.enums.CustomFeedbackType;
+import com.desafio.um.presentation.dtos.FeedbackDto;
 import com.desafio.um.presentation.services.ICustomerFeedbackService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
+import java.util.*;
+
 import com.desafio.um.domain.models.CustomerFeedback;
 import com.desafio.um.infrastructure.enums.CustomFeedbackStatus;
 
 @Service
 public class CustomerFeedbackService implements ICustomerFeedbackService {
 
-    private LinkedList<CustomerFeedback> listaSugestao = new LinkedList<>();
-    private LinkedList<CustomerFeedback> listaElogio = new LinkedList<>();
-    private LinkedList<CustomerFeedback> listaCritica = new LinkedList<>();
+    @Value("${aws.sns.topic.arn}")
+    private String SNS_TOPIC_ARN;
 
-    public void addLista(CustomerFeedback item) {
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        if (item.getFeeedbackType().equals(CustomFeedbackType.SUGESTOES)) {
-            item.setFeedbackStatus(CustomFeedbackStatus.RECEBIDO);
-            listaSugestao.addLast(item);
+    @Autowired
+    private AWSConfig snsConfig;
+
+    public void addLista(FeedbackDto feedbackDto) {
+
+        CustomerFeedback customerFeedback = new CustomerFeedback(
+                feedbackDto.getType(),
+                feedbackDto.getMessage()
+        );
+
+        try {
+            snsConfig.snsClient().publish(
+                    new PublishRequest()
+                            .withTopicArn(String.format(this.SNS_TOPIC_ARN, feedbackDto.getType().getTopicArn()))
+                            .withMessage(this.objectMapper.writeValueAsString(customerFeedback))
+            );
         }
-        if (item.getFeeedbackType().equals(CustomFeedbackType.ELOGIOS)) {
-            item.setFeedbackStatus(CustomFeedbackStatus.RECEBIDO);
-            listaElogio.addLast(item);
-        }
-        if (item.getFeeedbackType().equals(CustomFeedbackType.CRITICAS)) {
-            item.setFeedbackStatus(CustomFeedbackStatus.RECEBIDO);
-            listaCritica.addLast(item);
+        catch (JsonProcessingException e) {
+
         }
     }
 
     public CustomerFeedback removeLista(CustomFeedbackType type) {
-        if (type.equals(CustomFeedbackType.SUGESTOES)) {
-            if (isEmptyLista(type)) {
-                throw new IllegalStateException("Queue is empty");
-            }
-            //alterar o status antes de remover
-            CustomerFeedback itemRemovido = listaSugestao.removeFirst();
-            itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-            return itemRemovido;
-        } else {
-            if (type.equals(CustomFeedbackType.ELOGIOS)) {
-                if (isEmptyLista(type)) {
-                    throw new IllegalStateException("Queue is empty");
-                }
-                CustomerFeedback itemRemovido = listaElogio.removeFirst();
-                itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-                return itemRemovido;
-            } else {
-                if (isEmptyLista(type)) {
-                    throw new IllegalStateException("Queue is empty");
-                }
-                CustomerFeedback itemRemovido = listaCritica.removeFirst();
-                itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-                return itemRemovido;
-            }
-        }
-    }
-/*
-    public CustomerFeedback removeListaSugestao() {
-        if (isEmptyListaSugestao()) {
-            throw new IllegalStateException("Queue is empty");
-        }
-        //alterar o status antes de remover
-        CustomerFeedback itemRemovido = listaSugestao.removeFirst();
-        itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-        return itemRemovido;
+        List<Message> messages = this.retrieveMessagesFromSQS(type);
+        Message message = messages.get(0);
+        CustomerFeedback feedback = this.mapMessageToCustomerFeedback(message);
+        feedback.setStatus(CustomFeedbackStatus.FINALIZADO);
+        this.snsConfig.sqsClient().deleteMessage(
+                new DeleteMessageRequest()
+                        .withQueueUrl("")
+                        .withReceiptHandle(message.getReceiptHandle())
+        );
+        return feedback;
     }
 
-    public CustomerFeedback removeListaElogio() {
-        if (isEmptyListaElogio()) {
-            throw new IllegalStateException("Queue is empty");
-        }
-        CustomerFeedback itemRemovido = listaElogio.removeFirst();
-        itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-        return itemRemovido;
+    public List<CustomerFeedback> exibirLista(CustomFeedbackType type) {
+        return this.retrieveMessagesFromSQS(type)
+                .stream().map(this::mapMessageToCustomerFeedback)
+                .toList();
     }
 
-    public CustomerFeedback removeListaCritica() {
-        if (isEmptyListaCritica()) {
-            throw new IllegalStateException("Queue is empty");
-        }
-        CustomerFeedback itemRemovido = listaCritica.removeFirst();
-        itemRemovido.setFeedbackStatus(CustomFeedbackStatus.FINALIZADO);
-        return itemRemovido;
-    }*/
-
-    public boolean isEmptyLista(CustomFeedbackType type) {
-        if (type.equals(CustomFeedbackType.SUGESTOES)) {
-            return listaSugestao.isEmpty();
-        } else {
-            if (type.equals(CustomFeedbackType.ELOGIOS)) {
-                return listaElogio.isEmpty();
-            } else {
-                return listaCritica.isEmpty();
-            }
-        }
+    public Integer sizeLista(CustomFeedbackType type) {
+        return this.retrieveMessagesFromSQS(type)
+                .stream().map(this::mapMessageToCustomerFeedback).toList()
+                .size();
     }
 
-    /*
-        public boolean isEmptyListaElogio() {
-            return listaElogio.isEmpty();
-        }
-
-        public boolean isEmptyListaCritica() {
-            return listaCritica.isEmpty();
-        }
-    */
-    public int sizeLista(CustomFeedbackType type) {
-        if (type.equals(CustomFeedbackType.SUGESTOES)) {
-            return listaSugestao.size();
-        } else {
-            if (type.equals(CustomFeedbackType.ELOGIOS)) {
-                return listaElogio.size();
-            } else {
-                return listaCritica.size();
-            }
-        }
+    private List<Message> retrieveMessagesFromSQS(CustomFeedbackType type) {
+        return Optional.ofNullable(
+                this.snsConfig.sqsClient().receiveMessage(
+                        new ReceiveMessageRequest()
+                                .withQueueUrl("")
+                                .withMaxNumberOfMessages(1)
+                ).getMessages()
+        ).orElseThrow(() -> new NotFoundException("Fila vazia"));
     }
 
-    /*
-        public int sizeListaElogio() {
-            return listaElogio.size();
+    private CustomerFeedback mapMessageToCustomerFeedback(Message message) {
+        CustomerFeedback feedback = new CustomerFeedback();
+        try {
+            feedback = this.objectMapper.readValue(message.getBody(), CustomerFeedback.class);
         }
+        catch (JsonProcessingException e) {
 
-        public int sizeListaCritica() {
-            return listaCritica.size();
         }
-    */
-    public LinkedList<CustomerFeedback> exibirListaElogios(CustomFeedbackType type) {
-        if (type.equals(CustomFeedbackType.ELOGIOS)) {
-            return listaElogio;
-        } else {
-            if (type.equals(CustomFeedbackType.SUGESTOES)) {
-                return listaSugestao;
-            } else {
-                return listaCritica;
-            }
-        }
-    }
-/*
-    public LinkedList<CustomerFeedback> exibirListaCritica(){
-        return listaCritica;
+        return feedback;
     }
 
-    public LinkedList<CustomerFeedback> exibirListaSugestao(){
-        return listaSugestao;
-    }
-
-*/
 }
