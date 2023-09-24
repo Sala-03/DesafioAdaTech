@@ -1,16 +1,17 @@
 package com.desafio.um.infrastructure.enums;
 public enum CustomFeedbackType {
+
     SUGESTOES("Sugestão", "Sugestao"),
     ELOGIOS("Elogio", "Elogio"),
     CRITICAS("Crítica", "Critica");
 
     private final String description;
 
-    private final String topicArn;
+    private final String queueName;
 
-    CustomFeedbackType(String description, String topicArn) {
+    CustomFeedbackType(String description, String queueName) {
         this.description = description;
-        this.topicArn = topicArn;
+        this.queueName = queueName;
     }
 
     public String getName() {
@@ -21,7 +22,7 @@ public enum CustomFeedbackType {
         return this.description;
     }
 
-    public String getTopicArn() {
-        return this.topicArn;
+    public String getQueueName() {
+        return this.queueName;
     }
 }
