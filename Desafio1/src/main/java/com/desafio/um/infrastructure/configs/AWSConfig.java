@@ -1,20 +1,13 @@
 package com.desafio.um.infrastructure.configs;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSClient;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sns.AmazonSNSClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQSClient;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sns.model.Topic;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
 
 @Configuration
@@ -26,23 +19,28 @@ public class AWSConfig {
     @Value("${aws.secret.key}")
     private String SECRET_KEY;
 
+    @Value("${aws.region}")
+    private String AWS_REGION;
+
     @Bean
-    public AmazonSNS snsClient() {
-        return AmazonSNSClient.builder()
-                .withCredentials(
-                                new AWSStaticCredentialsProvider(
-                                        new BasicAWSCredentials(this.ACCESS_KEY, this.SECRET_KEY)
-                                )
+    public SnsClient snsClient() {
+        return SnsClient.builder()
+                .region(Region.of(this.AWS_REGION))
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(this.ACCESS_KEY, this.SECRET_KEY)
+                        )
                 )
                 .build();
     }
 
     @Bean
-    public AmazonSQS sqsClient() {
-        return AmazonSQSClient.builder()
-                .withCredentials(
-                        new AWSStaticCredentialsProvider(
-                                new BasicAWSCredentials(this.ACCESS_KEY, this.SECRET_KEY)
+    public SqsClient sqsClient() {
+        return SqsClient.builder()
+                .region(Region.of(this.AWS_REGION))
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(this.ACCESS_KEY, this.SECRET_KEY)
                         )
                 )
                 .build();
