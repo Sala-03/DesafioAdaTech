@@ -11,7 +11,7 @@ Desafio da Ada Tech Java Spring Boot Aws
 * Felipe Santa Cruz Simão
 * Robert Martins
 * Ana Paula Rodrigues
-* Thiago Moneteiro
+* Thiago Monteiro
 
 # Descrição
 
