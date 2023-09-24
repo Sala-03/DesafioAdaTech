@@ -33,7 +33,6 @@ public class AWSConfig {
                 )
                 .build();
     }
-
     @Bean
     public SqsClient sqsClient() {
         return SqsClient.builder()
