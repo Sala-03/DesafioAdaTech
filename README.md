@@ -15,13 +15,13 @@ Desafio da Ada Tech Java Spring Boot Aws
 
 # Descrição
 
-*Gerenciador de Feedbacks de Clientes , este projeto é um serviço Java baseado em Spring Boot que gerencia feedbacks de clientes, como sugestões, elogios e críticas. Ele aproveita os serviços da AWS, como SNS (Simple Notification Service) e SQS (Simple Queue Service), para enfileirar e processar os feedbacks de acordo com a ordem em que foram recebidos.
+* Gerenciador de Feedbacks de Clientes , este projeto é um serviço Java baseado em Spring Boot que gerencia feedbacks de clientes, como sugestões, elogios e críticas. Ele aproveita os serviços da AWS, como SNS (Simple Notification Service) e SQS (Simple Queue Service), para enfileirar e processar os feedbacks de acordo com a ordem em que foram recebidos.
 
 # Documentação
 
 Versões:
-Java sdk 17.9.8 <h3><a href= "[https://ada.tech/](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)">Oracle Java SDK</a></h3>
-IntelliJ 2023.2.2 <h3><a href= "<h3><a href= "https://www.jetbrains.com/pt-br/idea/download/?section=windows">JetBrains</a></h3>">JetBrains Intellij</a></h3>
+<p>Java sdk 17.9.8 <h3><a href= "https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html">Oracle Java SDK</a></h3> </p>
+<p>IntelliJ 2023.2.2 <h3><a href= "[https://www.jetbrains.com/pt-br/idea/download/?section=windows]">JetBrains</a></h3>">JetBrains Intellij</a></h3></p>
 
 
 # Releases
